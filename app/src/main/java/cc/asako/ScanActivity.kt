@@ -1,11 +1,8 @@
 package cc.asako;
 
 import android.Manifest
-import android.app.DownloadManager
-import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Camera
-import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -14,7 +11,6 @@ import android.util.Base64
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import android.view.View
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -36,7 +32,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
-import java.util.*
+import java.nio.charset.StandardCharsets
 
 class ScanActivity : ComponentActivity(), SurfaceHolder.Callback, Camera.PreviewCallback {
 
@@ -189,7 +185,12 @@ class ScanActivity : ComponentActivity(), SurfaceHolder.Callback, Camera.Preview
             try {
                 Log.e(TAG, "qr data : ${qrData}")
                 val json = JSONObject(qrData)
-                val name: String = json.getString("name")
+                val name: String = String(
+                    Base64.decode(
+                        json.getString("name").toByteArray(Charsets.UTF_8),
+                        Base64.DEFAULT
+                    ), StandardCharsets.UTF_8
+                )
                 val count: Int = json.getInt("count")
                 val index: Int = json.getInt("index")
                 val data: String = json.getString("data")
